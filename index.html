@@ -213,8 +213,13 @@ async function loadRemote(){
  return false
 }
 async function publishRemote(){
- var r=await sb.from('site_content').update({content:S,updated_at:new Date().toISOString()}).eq('id',1);
- if(r.error)throw r.error;dbReady=true;
+ var session=await sb.auth.getSession();
+ if(!session.data||!session.data.session)throw new Error('Администратор не авторизован в Supabase');
+ var r=await sb.from('site_content').update({content:S,updated_at:new Date().toISOString()}).eq('id',1).select('id,updated_at');
+ if(r.error)throw r.error;
+ if(!r.data||!r.data.length)throw new Error('Supabase не разрешил UPDATE. Проверьте RLS-политику и UID администратора.');
+ dbReady=true;
+ return r.data[0];
 }
 $('#lok').addEventListener('click',async function(){
  $('#le').textContent='Выполняю вход…';
@@ -231,8 +236,19 @@ function panel(){
  $('#list').innerHTML=S.items.map(function(i){return'<div class="row"><div class="t">'+thumb(i)+'</div><div class="n"><b>'+esc(i.n)+'</b><br><small style="color:var(--mut)">'+esc(i.c||'')+' · '+price(i)+'</small></div><button class="btn o sm" data-e="'+i.id+'">Изменить</button><button class="btn o sm" data-d="'+i.id+'">Удалить</button></div>'}).join('')}
 async function save(){
  $('#pst').textContent='Сохраняю…';
- try{await publishRemote();shop();panel();$('#pst').textContent='Сохранено. Изменения видны всем посетителям.'}
- catch(e){$('#pst').textContent='Ошибка сохранения: '+(e.message||'проверьте Supabase');alert('Не удалось сохранить изменения: '+(e.message||e))}
+ try{
+  await publishRemote();
+  var check=await sb.from('site_content').select('content,updated_at').eq('id',1).maybeSingle();
+  if(check.error)throw check.error;
+  if(!check.data||!check.data.content)throw new Error('Supabase не вернул сохранённый каталог');
+  S=check.data.content;
+  shop();panel();
+  $('#pst').textContent='Сохранено. Изменения видны всем посетителям.'
+ }catch(e){
+  var msg=e&&e.message?e.message:String(e);
+  $('#pst').textContent='Ошибка сохранения: '+msg;
+  alert('Не удалось опубликовать:\n\n'+msg)
+ }
 }
 function clr(){edit=null;photo=null;$('#ft').textContent='Новый товар';['#fn','#fp','#fc','#ff'].forEach(function(s){$(s).value=''})}
 $('#fx').addEventListener('click',clr);
