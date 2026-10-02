@@ -111,7 +111,7 @@ input:focus{outline:2px solid var(--g);outline-offset:1px}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a class="logo" href="#top">🌷 Цветочный Город "Любовь Арт"</a>
+<header><div class="wrap"><a class="logo" href="#top">🚲💐 Цветочный Город "Любовь Арт"</a>
 <nav><a href="#wheel">Скидка</a><a href="#shop">Ассортимент</a><a href="#contacts">Контакты</a></nav>
 <a class="btn sm" href="#wheel">Крутить колесо</a></div></header>
 
@@ -173,9 +173,12 @@ function thumb(i){return i.img?'<img loading="lazy" decoding="async" src="'+i.im
 function plural(n,a,b,c){var m=n%100,k=n%10;return m>10&&m<20?c:k==1?a:k>1&&k<5?b:c}
 function card(i,d){return'<div class="p" style="animation-delay:'+Math.min(d*25,300)+'ms"><div class="ph">'+thumb(i)+'</div><div class="pi"><small>'+esc(i.c||'')+'</small><h3>'+esc(i.n)+'</h3><div class="pr'+(i.p>0?'':' rq')+'">'+price(i)+'</div></div></div>'}
 function hero(){
- var withImg=S.items.filter(function(i){return i.img}),pick=[];
- cats().forEach(function(c){var f=withImg.filter(function(i){return i.c===c})[0];if(f&&pick.length<3)pick.push(f)});
- $('#hero').innerHTML=pick.map(function(i){return'<div class="c"><img src="'+i.img+'" alt="'+esc(i.n)+'"></div>'}).join('')+'<span class="em" style="left:-2%;bottom:14%">🌸</span><span class="em" style="right:0;bottom:6%">🌿</span>'}
+ var cards=[
+  {img:'https://i.postimg.cc/SNHppG5G/Snimok-ekrana-2026-10-02-184937.png',href:'https://2gis.ru/tyumen/search/%D0%A6%D0%B2%D0%B5%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B9%20%D0%93%D0%BE%D1%80%D0%BE%D0%B4%20%D0%9B%D1%8E%D0%B1%D0%BE%D0%B2%D1%8C%20%D0%90%D1%80%D1%82',alt:'Как нас найти'},
+  {img:'https://i.postimg.cc/tJtDmpLx/Snimok-ekrana-2026-10-02-185105.png',href:'#shop',alt:'Ассортимент'},
+  {img:'https://i.postimg.cc/VNmf3Rr7/Snimok-ekrana-2026-10-02-185235.png',href:'',alt:'Цветочный Город «Любовь Арт»'}
+ ];
+ $('#hero').innerHTML=cards.map(function(x){var im='<img src="'+x.img+'" alt="'+esc(x.alt)+'">';return x.href?'<a class="c" href="'+x.href+'"'+(x.href.indexOf('http')===0?' target="_blank" rel="noopener"':'')+'>'+im+'</a>':'<div class="c">'+im+'</div>'}).join('')+'<span class="em" style="left:-2%;bottom:14%">🌸</span><span class="em" style="right:0;bottom:6%">🌿</span>'}
 function shop(){
  var all=cats(),cs=['Все'].concat(all);if(cs.indexOf(flt)<0)flt='Все';
  var cnt=function(c){return c==='Все'?S.items.length:S.items.filter(function(i){return i.c===c}).length};
